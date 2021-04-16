@@ -1,10 +1,8 @@
 package org.jlmorenoo.poo.clases.abstracts.form;
 
-import org.jlmorenoo.poo.clases.abstracts.form.elementos.ElementoForm;
-import org.jlmorenoo.poo.clases.abstracts.form.elementos.InputForm;
-import org.jlmorenoo.poo.clases.abstracts.form.elementos.SelectForm;
-import org.jlmorenoo.poo.clases.abstracts.form.elementos.TextareaForm;
+import org.jlmorenoo.poo.clases.abstracts.form.elementos.*;
 import org.jlmorenoo.poo.clases.abstracts.form.elementos.select.Opcion;
+import org.jlmorenoo.poo.clases.abstracts.form.validador.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,9 +12,9 @@ public class EjemploForm {
     public static void main(String[] args) {
 
         /*
-        * No se puede instaciar una clase abstracta,
-        * para poder solucionar este inconveniente se crea una clase anónima
-        **/
+         * No se puede instaciar una clase abstracta,
+         * para poder solucionar este inconveniente se crea una clase anónima
+         **/
 
        /* ElementoForm elementoForm = new ElementoForm() {
             @Override
@@ -26,28 +24,48 @@ public class EjemploForm {
         };*/
 
         InputForm username = new InputForm("username");
+        username.addValidador(new RequeridoValidador());
+
         InputForm password = new InputForm("clave", "password");
+        password.addValidador(new RequeridoValidador())
+                .addValidador(new LargoValidador(6, 12));
+
         InputForm email = new InputForm("email", "email");
+        email.addValidador(new RequeridoValidador())
+                .addValidador(new EmailValidador());
+
         InputForm edad = new InputForm("edad", "number");
+        edad.addValidador(new NumeroValidador());
 
         TextareaForm experiencia = new TextareaForm("exp", 5, 9);
 
         SelectForm lenguaje = new SelectForm("Lenguaje");
+        lenguaje.addValidador( new NoNuloValidador());
 
-        Opcion java = new Opcion("Java", "1");
-        lenguaje.addOpcion(java)
-        .addOpcion(new Opcion("Python", "2"))
-        .addOpcion(new Opcion("JavaScript", "3"))
-        .addOpcion(new Opcion("TypeScript", "4"))
-        .addOpcion(new Opcion("PHP", "5"));
+        //Opcion typeSccript = new  Opcion("TypeScript", "4");
+        lenguaje.addOpcion(new Opcion("Java", "1").setSelected())
+                .addOpcion(new Opcion("Python", "2"))
+                .addOpcion(new Opcion("JavaScript", "3"))
+                .addOpcion(new Opcion("TypeScript", "4"))
+                .addOpcion(new Opcion("PHP", "5"));
 
 
-        username.setValor("jlmoreno.ospina");
-        password.setValor("1a586");
+        ElementoForm saludar = new ElementoForm("saludo") {
+            @Override
+            public String dibujarHtml() {
+                return "<input disabled name=" + this.nombre + "' value=\"" + this.valor + "\">";
+            }
+        };
+
+
+        saludar.setValor("Este campo esta deshabilitado");
+        username.setValor("jose.moreno");
+        password.setValor("sd585s75");
         email.setValor("josel.moreno@correo.com");
-        edad.setValor("34");
+        edad.setValor("15");
         experiencia.setValor("... más de 10 años de experiencia ... ");
-        java.setSelected(true);
+        //java.setSelected(true);
+        //typeSccript.setSelected(true);
 
         /*List<ElementoForm> elementoFormList = new ArrayList<>();
         elementoFormList.add(username);
@@ -61,15 +79,22 @@ public class EjemploForm {
                 email,
                 edad,
                 experiencia,
-                lenguaje);
+                lenguaje,
+                saludar);
 
         /*for (ElementoForm elmElementoForm : elementoFormList) {
             System.out.println(elmElementoForm.dibujarHtml());
             System.out.println("<br>");
         }*/
-        elementoFormList.forEach( elem -> {
+        elementoFormList.forEach(elem -> {
             System.out.println(elem.dibujarHtml());
             System.out.println("<br>");
+        });
+
+        elementoFormList.forEach( elem -> {
+            if (!elem.isValido()) {
+                elem.getErroresList().forEach(System.out::println);
+            }
         });
 
 
